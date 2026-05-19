@@ -16,6 +16,9 @@ const NAV_ITEMS = [
       { key: "aboutAdmission", href: "/section/about/admission" },
       { key: "aboutVacancies", href: "/section/about/vacancies" },
       { key: "aboutReports", href: "/section/about/reports" },
+      { key: "aboutLicense", href: "/section/about/license" },
+      { key: "aboutInternalEvaluation", href: "/section/about/evaluation" },
+      { key: "aboutEvaluationPlan", href: "/section/about/evaluationPlan" },
     ],
   },
   {

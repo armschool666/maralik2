@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 export default function LoginPage() {
+  const [login, setLogin] = useState("");
   const [token, setToken] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -16,18 +17,18 @@ export default function LoginPage() {
       const response = await fetch("/api/auth", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token }),
+        body: JSON.stringify({ login, token }),
       });
 
       if (response.ok) {
-        // Hard navigation ensures the new cookie is included in the next request.
-        // router.push() can serve a cached (pre-cookie) render of /admin.
         window.location.href = "/admin";
+      } else if (response.status === 429) {
+        setError("Слишком много попыток. Попробуйте снова через 15 минут.");
       } else {
-        setError("Սխալ գաղտնի կոդ։ Կրկին փորձեք։");
+        setError("Неверный логин или пароль. Попробуйте ещё раз.");
       }
     } catch {
-      setError("Կապի սխալ։ Ստուգեք ինտերնետ կապը։");
+      setError("Ошибка соединения. Проверьте интернет-подключение.");
     } finally {
       setLoading(false);
     }
@@ -37,17 +38,29 @@ export default function LoginPage() {
     <main className="login-wrap">
       <form className="login-form" onSubmit={handleSubmit}>
         <div className="login-logo">Փ</div>
-        <h1>Ադմին մուտք</h1>
-        <p>Մուտքագրեք ադմինի գաղտնի կոդը՝ կայքի կառավարման վահանակ մտնելու համար</p>
+        <h1>Вход в админ-панель</h1>
+        <p>Введите логин и пароль для доступа к управлению сайтом.</p>
 
         <label>
-          Գաղտնի կոդ
+          Логин
+          <input
+            type="text"
+            value={login}
+            onChange={(e) => setLogin(e.target.value)}
+            placeholder="admin"
+            autoFocus
+            autoComplete="username"
+            required
+          />
+        </label>
+
+        <label>
+          Пароль
           <input
             type="password"
             value={token}
             onChange={(e) => setToken(e.target.value)}
             placeholder="••••••••••••"
-            autoFocus
             autoComplete="current-password"
             required
           />
@@ -56,7 +69,7 @@ export default function LoginPage() {
         {error ? <p className="login-error">{error}</p> : null}
 
         <button type="submit" disabled={loading}>
-          {loading ? "Ստուգում..." : "Մուտք գործել"}
+          {loading ? "Проверка..." : "Войти"}
         </button>
       </form>
     </main>
