@@ -38,6 +38,7 @@ export function createBlobJsonStore<T>(blobKey: string, fallback: T): JsonStore<
     const blob = await put(blobKey, JSON.stringify(value, null, 2), {
       access: "public",
       addRandomSuffix: false,
+      allowOverwrite: true,
     });
     cachedUrl = blob.url;
   }
