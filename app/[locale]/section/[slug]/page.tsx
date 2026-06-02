@@ -21,7 +21,7 @@ export default async function SectionPage({
     notFound();
   }
 
-  const noImage = ["about", "councils", "staff", "resources", "learning", "students", "competitions"].includes(section.slug);
+  const noImage = ["about", "councils", "staff", "resources", "learning", "students", "competitions", "events"].includes(section.slug);
 
   return (
     <SiteShell>
