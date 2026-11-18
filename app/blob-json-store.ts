@@ -1,4 +1,3 @@
-import { BlobNotFoundError, head, put } from "@vercel/blob";
 import { revalidateTag, unstable_cache } from "next/cache";
 import type { JsonStore } from "./json-store";
 
@@ -6,6 +5,7 @@ export function createBlobJsonStore<T>(blobKey: string, fallback: T): JsonStore<
   const cacheTag = `blob-json:${blobKey}`;
 
   async function readRaw(): Promise<T> {
+    const { BlobNotFoundError, head } = await import("@vercel/blob");
     try {
       const blob = await head(blobKey);
       const url = new URL(blob.url);
@@ -27,6 +27,7 @@ export function createBlobJsonStore<T>(blobKey: string, fallback: T): JsonStore<
   });
 
   async function write(value: T): Promise<void> {
+    const { put } = await import("@vercel/blob");
     await put(blobKey, JSON.stringify(value, null, 2), {
       access: "public",
       addRandomSuffix: false,

@@ -1,7 +1,7 @@
 import path from "node:path";
-import { del, put } from "@vercel/blob";
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "../auth-check";
+import { getContentBucket } from "../../cloudflare-r2";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -81,6 +81,16 @@ export async function POST(request: NextRequest) {
   }
 
   const blobName = safeFileName(file.name);
+
+  const bucket = getContentBucket();
+  if (bucket) {
+    await bucket.put(blobName, buffer, {
+      httpMetadata: { contentType: file.type || "application/octet-stream" },
+    });
+    return NextResponse.json({ name: file.name, href: `/api/files/${blobName}`, size: file.size });
+  }
+
+  const { put } = await import("@vercel/blob");
   const blob = await put(blobName, buffer, { access: "public", addRandomSuffix: false });
 
   return NextResponse.json({ name: file.name, href: blob.url, size: file.size });
@@ -95,7 +105,23 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ error: "Missing href" }, { status: 400 });
   }
 
+  const bucket = getContentBucket();
+  if (bucket) {
+    const pathname = new URL(href, request.url).pathname;
+    const routePrefix = "/api/files/";
+    if (!pathname.startsWith(`${routePrefix}uploads/`)) {
+      return NextResponse.json({ error: "Invalid href" }, { status: 400 });
+    }
+    const objectKey = decodeURIComponent(pathname.slice(routePrefix.length));
+    if (objectKey.includes("..")) {
+      return NextResponse.json({ error: "Invalid href" }, { status: 400 });
+    }
+    await bucket.delete(objectKey);
+    return NextResponse.json({ ok: true });
+  }
+
   try {
+    const { del } = await import("@vercel/blob");
     await del(href);
   } catch {
     // Already deleted or not a blob URL — treat as success
