@@ -8,6 +8,10 @@
   "compatibility_flags": ["nodejs_compat"],
   "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
   "observability": { "enabled": true },
+  "routes": [
+    { "pattern": "maralik2school.am", "custom_domain": true },
+    { "pattern": "www.maralik2school.am", "custom_domain": true }
+  ],
   "r2_buckets": [
     { "binding": "MATERIALS_BUCKET", "bucket_name": "maralik2-school-content" }
   ]
