@@ -1,6 +1,8 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "maralik2-school",
+  "name": "maralik2",
+  // ADMIN_LOGIN / ADMIN_TOKEN are managed in the Cloudflare dashboard.
+  "keep_vars": true,
   "main": ".open-next/worker.js",
   "compatibility_date": "2026-10-12",
   "compatibility_flags": ["nodejs_compat"],
